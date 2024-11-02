@@ -63,14 +63,10 @@ class BlogsController < ApplicationController
 
   def import
     file = params[:attachment]
-    data = CSV.parse(file.to_io, headers: true, encoding: 'utf8')
-    # Start code to handle CSV data
-    ActiveRecord::Base.transaction do
-      data.each do |row|
-        current_user.blogs.create!(row.to_h)
-      end
-    end
-    # End code to handle CSV data
+    blog_import = BlogImport.new(current_user, file)
+    blog_import.call
+    flash[blog_import.errors.present? ? :alert : :notice] = blog_import.errors.presence || 'Blogs imported successfully!'
+
     redirect_to blogs_path
   end
 
