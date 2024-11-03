@@ -1,6 +1,6 @@
-<%= form_with(model: blog)  do |form| %>
+<%= form_with(model: blog) do |form| %>
   <% if blog.errors.any? %>
-    <div style="color: red">
+    <div class="alert alert-danger">
       <h2><%= pluralize(blog.errors.count, "error") %> prohibited this blog from being saved:</h2>
 
       <ul>
@@ -12,14 +12,14 @@
   <% end %>
 
   <div class="mb-3">
-    <label for="title" class="form-label">Title</label>
+    <%= form.label :title, class: 'form-label' %>
     <%= form.text_field :title, class: 'form-control' %>
-    
   </div>
+
   <div class="mb-3">
-    <label for="body" class="form-label">Body</label>
+    <%= form.label :body, class: 'form-label' %>
     <%= form.text_area :body, class: 'form-control' %>
   </div>
 
-  <%= submit_tag "Submit", class: 'btn btn-primary' %>
+  <%= form.submit "Submit", class: 'btn btn-primary' %>
 <% end %>

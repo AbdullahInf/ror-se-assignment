@@ -1,28 +1,24 @@
-<p style="color: green"><%= notice %></p>
-<p style="color: red"><%= alert %></p>
-
-
 <div class="container" id="blogs">
-<h1>Blogs</h1>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Title</th>
-      <th scope="col">Body</th>
-      <th scope="col">User</th>
-      <th colspan="2" scope="col">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-  <% @blogs.each do |blog| %>
-   <%= render blog %>  
+  <% flash.each do |key, message| %>
+    <% css_class = key == 'notice' ? 'alert-success' : 'alert-danger' %>
+    <p class="alert <%= css_class %>"><%= message %></p>
   <% end %>
-  </tbody>
-</table>
-<%== pagy_bootstrap_nav(@pagy) %>
 
+  <h1>Blogs</h1>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Title</th>
+        <th scope="col">Body</th>
+        <th scope="col">User</th>
+        <th colspan="2" scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render @blogs %>
+    </tbody>
+  </table>
+  <%== pagy_bootstrap_nav(@pagy) %>
 </div>
-
-
