@@ -5,7 +5,8 @@
   <td><%= blog.user.email %></td>
   
   <% if blog.user == current_user %>
-    <td><a href="<%= edit_blog_path(blog)%>" class="card-link">Edit</a></td>
+    <td><%= link_to 'Delete', blog_path(blog), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
+    <td><%= link_to 'Edit', edit_blog_path(blog), class: 'card-link' %></td>
   <% end %>
-    <td><a href="<%= blog_path(blog)%>" class="card-link">Show</a></td>
+    <td><%= link_to 'Show', blog_path(blog), class: 'card-link' %></td>
 </tr>
