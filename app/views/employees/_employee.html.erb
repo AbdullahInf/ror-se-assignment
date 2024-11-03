@@ -1,0 +1,9 @@
+<tr>
+  <th scope="row"><%= employee.dig("id") %></th>
+  <td><%= employee.dig("name") %></td>
+  <td><%= employee.dig("salary") %></td>
+  <td><%= employee.dig("position") %></td>
+  <td><%= employee.dig("date_of_birth") %></td>
+  <td><%= link_to 'Edit', edit_employee_path(employee["id"]) %></td>
+  <td><%= link_to 'Show', employee_path(employee["id"]) %></td>
+</tr>

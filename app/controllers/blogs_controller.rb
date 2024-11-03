@@ -1,18 +1,15 @@
 require 'csv'
 class BlogsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_blog, only: %i[ show edit update destroy ]
+  before_action :set_blog, only: %i[show edit update destroy]
 
   # GET /blogs or /blogs.json
   def index
-    # @blogs = current_user.blogs
-    @pagy, @blogs = pagy(current_user.blogs)
-
+    @pagy, @blogs = pagy(filtered_blogs)
   end
 
   # GET /blogs/1 or /blogs/1.json
-  def show
-  end
+  def show; end
 
   # GET /blogs/new
   def new
@@ -20,8 +17,7 @@ class BlogsController < ApplicationController
   end
 
   # GET /blogs/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /blogs or /blogs.json
   def create
@@ -53,35 +49,40 @@ class BlogsController < ApplicationController
 
   # DELETE /blogs/1 or /blogs/1.json
   def destroy
-    @blog.destroy
-
     respond_to do |format|
-      format.html { redirect_to blogs_url, notice: "Blog was successfully destroyed." }
-      format.json { head :no_content }
+      if @blog.destroy
+        format.html { redirect_to blogs_url, notice: "Blog was successfully destroyed." }
+        format.json { head :no_content }
+      else
+        format.html { redirect_to blogs_url, alert: "Failed to destroy the blog." }
+        format.json { render json: @blog.errors, status: :unprocessable_entity }
+      end
     end
   end
 
   def import
     file = params[:attachment]
-    data = CSV.parse(file.to_io, headers: true, encoding: 'utf8')
-    # Start code to handle CSV data
-    ActiveRecord::Base.transaction do
-      data.each do |row|
-        current_user.blogs.create!(row.to_h)
-      end
-    end
-    # End code to handle CSV data
+    blog_import = BlogImport.new(current_user, file)
+    blog_import.call
+    flash[blog_import.errors.present? ? :alert : :notice] = blog_import.errors.presence || 'Blogs imported successfully!'
+
     redirect_to blogs_path
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_blog
-      @blog = current_user.blogs.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_blog
+    @blog = current_user.blogs.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def blog_params
-      params.require(:blog).permit(:title, :body, :user_id)
-    end
+  # Only allow a list of trusted parameters through.
+  def blog_params
+    params.require(:blog).permit(:title, :body, :user_id)
+  end
+
+  def filtered_blogs
+    current_blogs = current_user.blogs
+    current_blogs = current_blogs.where("title ILIKE :query OR body ILIKE :query", query: "%#{params[:search]}%") if params[:search].present?
+    current_blogs
+  end
 end
